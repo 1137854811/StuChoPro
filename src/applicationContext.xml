@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd ">
+	<!-- 配置数据源 -->	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<!-- 数据库驱动 -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<!-- 连接数据url -->
+		<property name="url" value="jdbc:mysql://localhost:3306/tian?useUnicode=true&amp;characterEncoding=utf8"></property>
+		<!-- 连接数据库的用户名 -->
+		<property name="username" value="root"></property>
+		<!-- 密码 -->
+		<property name="password" value="tianzhuang"></property>
+	
+	</bean>
+	
+	<!-- 配置Mybatis的工厂SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 指定映射文件所在包，自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:nyist/net/dao/*.xml"></property>
+	</bean>
+	
+	<!--配置mapper扫描器 -->	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 注入sqlSessionFactory -->
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+		<!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+		<!-- 扫描mapper接口的包，即将此包下所有符合条件的mapper接口，自动创建代理对象，并加载到SpringIOC容器管理 -->
+		<!-- 遵循规范：mapper接口和mapper映射文件名称需保持一致，且在同一个目录，自动扫描出来的mapper代理对象的bean的id为类名首字母小写 -->
+		<property name="basePackage" value="nyist.net.dao"></property>
+		
+	</bean>
+	
+	<!-- 事物 -->
+	<bean id="txManager"  
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource"></property>  
+    </bean> 
+    
+    <tx:annotation-driven />  
+
+</beans>
